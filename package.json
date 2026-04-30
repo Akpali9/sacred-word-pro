@@ -1,0 +1,13 @@
+{
+  "name":"sacred-word-pro",
+  "scripts":{
+    "build:data":"node scripts/build-datasets.js",
+    "start":"node server/notes-api.js"
+  },
+  "dependencies":{
+    "express":"^4.18.0",
+    "firebase":"^10.0.0",
+    "minisearch":"^6.1.0",
+    "node-fetch":"^3.0.0"
+  }
+}
