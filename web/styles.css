@@ -1,0 +1,42 @@
+body{
+  margin:0;
+  font-family:serif;
+  background:#0d0a07;
+  color:#eee;
+}
+
+header{
+  padding:10px;
+  border-bottom:1px solid #333;
+}
+
+main{
+  display:flex;
+  height:100vh;
+}
+
+aside{
+  width:260px;
+  overflow:auto;
+  border-right:1px solid #333;
+}
+
+section{
+  flex:1;
+  padding:10px;
+  overflow:auto;
+}
+
+.book{
+  padding:8px;
+  cursor:pointer;
+}
+
+.book:hover{
+  background:#222;
+}
+
+.verse{
+  padding:6px;
+  border-bottom:1px solid #222;
+}
