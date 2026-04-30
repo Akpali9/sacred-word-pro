@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Sacred Word Pro</title>
+
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="styles.css">
+
+<script src="https://cdn.jsdelivr.net/npm/minisearch@6.1.0/dist/umd/index.min.js"></script>
+</head>
+
+<body>
+
+<header>
+  <h1>Sacred Word Pro</h1>
+  <input id="search" placeholder="Search scripture..." oninput="doSearch()"/>
+</header>
+
+<main>
+  <aside id="books"></aside>
+  <section id="content">Loading...</section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
