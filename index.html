@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sacred Word — Complete Bible with Apocrypha</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0d0a07;--bg2:#13100c;--bg3:#1c1710;
+    --gold:#c9a84c;--gold-light:#e8c97a;--gold-dim:#6b5828;
+    --cream:#f0e6d0;--cream-dim:#a89880;
+    --purple:#5a3570;--purple-light:#9b6bbf;--purple-dim:#3a2248;
+    --border:#2e2418;--border-gold:rgba(201,168,76,0.25);--border-purple:rgba(155,107,191,0.25);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--cream);font-family:'EB Garamond',serif;font-size:18px;min-height:100vh;overflow-x:hidden}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(201,168,76,0.07) 0%,transparent 70%),radial-gradient(ellipse 40% 40% at 10% 80%,rgba(139,44,44,0.05) 0%,transparent 60%),radial-gradient(ellipse 30% 30% at 90% 60%,rgba(90,53,112,0.04) 0%,transparent 60%);pointer-events:none;z-index:0}
+  .wrapper{position:relative;z-index:1;display:flex;flex-direction:column;min-height:100vh}
+
+  /* HEADER */
+  header{text-align:center;padding:36px 20px 26px;border-bottom:1px solid var(--border-gold);position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:200px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+  .logo-ornament{font-size:11px;letter-spacing:8px;color:var(--gold);text-transform:uppercase;margin-bottom:8px;opacity:.7}
+  h1{font-family:'Cinzel',serif;font-size:clamp(1.9rem,5vw,3.2rem);font-weight:700;color:var(--gold-light);letter-spacing:4px;text-shadow:0 0 40px rgba(201,168,76,.3)}
+  .subtitle{margin-top:6px;font-size:13px;letter-spacing:3px;color:var(--cream-dim);text-transform:uppercase}
+
+  /* LAYOUT */
+  main{display:grid;grid-template-columns:285px 1fr;flex:1}
+
+  /* SIDEBAR */
+  aside{border-right:1px solid var(--border);background:var(--bg2);position:sticky;top:0;height:calc(100vh - 130px);overflow-y:auto;display:flex;flex-direction:column}
+  aside::-webkit-scrollbar{width:4px}
+  aside::-webkit-scrollbar-track{background:var(--bg2)}
+  aside::-webkit-scrollbar-thumb{background:var(--gold-dim);border-radius:2px}
+
+  .sidebar-section{padding:14px;border-bottom:1px solid var(--border)}
+  .sidebar-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:4px;color:var(--gold);text-transform:uppercase;margin-bottom:9px;opacity:.8}
+
+  select{width:100%;background:var(--bg3);border:1px solid var(--border-gold);color:var(--cream);font-family:'EB Garamond',serif;font-size:14px;padding:7px 28px 7px 9px;border-radius:2px;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23c9a84c'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;transition:border-color .2s}
+  select:focus{border-color:var(--gold)}
+  select option{background:#1c1710}
+
+  /* Testament tabs */
+  .testament-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+  .testament-tab{flex:1;background:none;border:none;color:var(--cream-dim);font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:10px 2px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s}
+  .testament-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+  .testament-tab.apoc-tab.active{color:var(--purple-light);border-bottom-color:var(--purple-light)}
+  .testament-tab:hover{color:var(--cream)}
+
+  /* Book panels */
+  .book-panel{display:none}
+  .book-panel.active{display:block}
+  .book-section-head{font-family:'Cinzel',serif;font-size:8px;letter-spacing:3px;color:var(--gold-dim);text-transform:uppercase;padding:10px 14px 5px;border-bottom:1px solid var(--border)}
+  .book-section-head.apoc-head{color:var(--purple-dim)}
+
+  .book-list{list-style:none}
+  .book-item{padding:6px 14px;cursor:pointer;font-size:14px;color:var(--cream-dim);border-left:2px solid transparent;transition:all .15s;user-select:none}
+  .book-item:hover{color:var(--cream);background:rgba(201,168,76,.05)}
+  .book-item.active{color:var(--gold-light);border-left-color:var(--gold);background:rgba(201,168,76,.08)}
+  .book-item.apoc-item:hover{background:rgba(155,107,191,.07)}
+  .book-item.apoc-item.active{color:var(--purple-light);border-left-color:var(--purple-light);background:rgba(155,107,191,.1)}
+
+  /* Chapter grid */
+  .chapter-sidebar{display:none;padding:12px 14px;border-bottom:1px solid var(--border)}
+  .chapter-sidebar.visible{display:block}
+  .chapter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(34px,1fr));gap:4px;margin-top:9px}
+  .chapter-btn{background:var(--bg3);border:1px solid var(--border);color:var(--cream-dim);font-family:'EB Garamond',serif;font-size:13px;padding:5px 3px;cursor:pointer;border-radius:2px;text-align:center;transition:all .15s}
+  .chapter-btn:hover{border-color:var(--gold);color:var(--gold-light)}
+  .chapter-btn.ch-active{background:var(--gold);color:var(--bg);font-weight:600}
+  .chapter-btn.ch-apoc{background:var(--purple-light);color:var(--bg)}
+
+  /* CONTENT */
+  .content{padding:36px clamp(16px,5vw,70px);max-width:800px;margin:0 auto;width:100%}
+
+  /* Tabs */
+  .tabs{display:flex;border-bottom:1px solid var(--border-gold);margin-bottom:28px}
+  .tab-btn{background:none;border:none;color:var(--cream-dim);font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:11px 16px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s}
+  .tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+  .tab-btn:hover{color:var(--cream)}
+
+  /* Chapter header */
+  .chapter-header{margin-bottom:26px;padding-bottom:16px;border-bottom:1px solid var(--border-gold)}
+  .chapter-title{font-family:'Cinzel',serif;font-size:clamp(1.3rem,3vw,1.9rem);color:var(--gold-light);font-weight:600}
+  .chapter-title.apoc-title{color:var(--purple-light)}
+  .version-badge{display:inline-block;margin-top:5px;font-size:11px;letter-spacing:3px;color:var(--gold-dim);text-transform:uppercase}
+
+  /* Apocrypha banner */
+  .apoc-banner{background:linear-gradient(135deg,rgba(90,53,112,.15),rgba(90,53,112,.05));border:1px solid var(--border-purple);border-radius:3px;padding:14px 18px;margin-bottom:22px;font-size:14px;color:var(--cream-dim);font-style:italic;line-height:1.7}
+  .apoc-banner strong{color:var(--purple-light);font-style:normal}
+
+  /* Verses */
+  .verses-container{display:flex;flex-direction:column}
+  .verse{display:flex;gap:14px;padding:9px 6px;border-bottom:1px solid rgba(46,36,24,.35);transition:background .15s;border-radius:2px;cursor:pointer}
+  .verse:hover{background:rgba(201,168,76,.04)}
+  .verse.highlighted{background:rgba(201,168,76,.1)}
+  .verse.apoc-verse:hover{background:rgba(155,107,191,.05)}
+  .verse.apoc-verse.highlighted{background:rgba(155,107,191,.12)}
+  .verse-num{font-family:'Cinzel',serif;font-size:10px;color:var(--gold);min-width:26px;padding-top:5px;text-align:right;opacity:.65;flex-shrink:0}
+  .verse-num.apoc-num{color:var(--purple-light)}
+  .verse-text{font-size:18px;line-height:1.85;color:var(--cream)}
+
+  /* Nav */
+  .chapter-nav{display:flex;justify-content:space-between;align-items:center;margin-top:44px;padding-top:22px;border-top:1px solid var(--border-gold)}
+  .nav-btn{background:transparent;border:1px solid var(--border-gold);color:var(--gold);font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:9px 20px;cursor:pointer;transition:all .2s;border-radius:2px}
+  .nav-btn:hover{background:var(--gold);color:var(--bg);border-color:var(--gold)}
+  .nav-btn:disabled{opacity:.2;cursor:not-allowed}
+  .nav-btn.apoc-nav{border-color:var(--border-purple);color:var(--purple-light)}
+  .nav-btn.apoc-nav:hover{background:var(--purple-light);color:var(--bg);border-color:var(--purple-light)}
+
+  /* Search */
+  .search-wrap{display:flex;gap:8px;margin-bottom:22px}
+  .search-input{flex:1;background:var(--bg3);border:1px solid var(--border-gold);color:var(--cream);font-family:'EB Garamond',serif;font-size:16px;padding:10px 14px;border-radius:2px;outline:none;transition:border-color .2s}
+  .search-input:focus{border-color:var(--gold)}
+  .search-input::placeholder{color:var(--cream-dim);opacity:.5}
+  .search-btn{background:var(--gold);border:none;color:var(--bg);font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;padding:10px 16px;cursor:pointer;border-radius:2px;transition:opacity .2s}
+  .search-btn:hover{opacity:.85}
+
+  /* States */
+  .loading-state{text-align:center;padding:80px 20px;color:var(--cream-dim)}
+  .loading-cross{font-size:38px;color:var(--gold);display:block;margin-bottom:14px;animation:pulse 1.5s ease-in-out infinite}
+  .loading-cross.apoc{color:var(--purple-light)}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .welcome-state{text-align:center;padding:60px 20px}
+  .welcome-icon{font-size:44px;color:var(--gold);margin-bottom:20px;opacity:.6}
+  .welcome-title{font-family:'Cinzel',serif;font-size:1.5rem;color:var(--gold-light);margin-bottom:10px}
+  .welcome-text{color:var(--cream-dim);font-style:italic;line-height:1.8;max-width:420px;margin:0 auto}
+  .error-state{text-align:center;padding:60px 20px;color:var(--cream-dim)}
+  .error-state span{font-size:30px;display:block;margin-bottom:10px}
+
+  /* Toast */
+  .toast{position:fixed;bottom:22px;right:22px;background:var(--gold);color:var(--bg);font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;padding:9px 16px;border-radius:2px;transform:translateY(80px);opacity:0;transition:all .3s ease;z-index:1000}
+  .toast.show{transform:translateY(0);opacity:1}
+
+  /* About */
+  .apoc-card{padding:14px 16px;background:rgba(90,53,112,.08);border:1px solid rgba(90,53,112,.2);border-radius:3px;cursor:pointer;transition:background .15s}
+  .apoc-card:hover{background:rgba(90,53,112,.15)}
+  .apoc-card-title{font-family:'Cinzel',serif;font-size:12px;color:var(--purple-light);letter-spacing:2px;margin-bottom:6px}
+  .apoc-card-desc{font-size:14px;color:var(--cream-dim);font-style:italic;line-height:1.65}
+  .apoc-card-canon{margin-top:5px;font-size:12px;color:var(--gold-dim);letter-spacing:1px}
+
+  @media(max-width:768px){
+    main{grid-template-columns:1fr}
+    aside{height:auto;position:relative;border-right:none;border-bottom:1px solid var(--border);max-height:45vh}
+    .content{padding:20px 14px}
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+<header>
+  <div class="logo-ornament">✦ &nbsp; Complete Sacred Texts &nbsp; ✦</div>
+  <h1>SACRED WORD</h1>
+  <div class="subtitle">The Holy Bible &amp; The Apocrypha</div>
+</header>
+
+<main>
+  <aside>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Version</div>
+      <select id="versionSelect" onchange="onVersionChange()">
+        <optgroup label="English">
+          <option value="en-asv">ASV — American Standard</option>
+          <option value="en-kjv">KJV — King James</option>
+          <option value="en-web">WEB — World English</option>
+          <option value="en-bbe">BBE — Basic English</option>
+          <option value="en-dra">DRA — Douay-Rheims</option>
+        </optgroup>
+        <optgroup label="Other Languages">
+          <option value="fr-apee">French — APEE</option>
+          <option value="de-schlachter">German — Schlachter</option>
+          <option value="es-pddpt">Spanish — Palabra de Dios</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <div class="chapter-sidebar" id="chapterSidebar">
+      <div class="sidebar-label">Chapter</div>
+      <div class="chapter-grid" id="chapterGrid"></div>
+    </div>
+
+    <div class="testament-tabs">
+      <button class="testament-tab active" onclick="showPanel('ot',this)">Old Test.</button>
+      <button class="testament-tab" onclick="showPanel('nt',this)">New Test.</button>
+      <button class="testament-tab apoc-tab" onclick="showPanel('apoc',this)">✦ Apocrypha</button>
+    </div>
+
+    <div class="book-panel active" id="panel-ot">
+      <div class="book-section-head">Old Testament — 39 Books</div>
+      <ul class="book-list" id="otBooks"></ul>
+    </div>
+    <div class="book-panel" id="panel-nt">
+      <div class="book-section-head">New Testament — 27 Books</div>
+      <ul class="book-list" id="ntBooks"></ul>
+    </div>
+    <div class="book-panel" id="panel-apoc">
+      <div class="book-section-head apoc-head">Apocrypha / Deuterocanon — 15 Books</div>
+      <ul class="book-list" id="apocBooks"></ul>
+    </div>
+  </aside>
+
+  <div class="content">
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-read" onclick="switchTab('read',this)">Read</button>
+      <button class="tab-btn" id="tab-search" onclick="switchTab('search',this)">Search</button>
+      <button class="tab-btn" id="tab-about" onclick="switchTab('about',this)">About Apocrypha</button>
+    </div>
+
+    <div id="readTab">
+      <div id="contentArea">
+        <div class="welcome-state">
+          <div class="welcome-icon">✝</div>
+          <div class="welcome-title">Welcome to Sacred Word</div>
+          <p class="welcome-text">Select any book from the sidebar to begin reading.<br><br>This site includes all <strong style="color:var(--gold)">66 canonical books</strong> plus the full <strong style="color:var(--purple-light)">Apocrypha</strong> — 15 ancient books removed from most Protestant Bibles.<br><br>Click any verse to copy it.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="searchTab" style="display:none">
+      <div class="search-wrap">
+        <input class="search-input" id="searchInput" type="text" placeholder="e.g.  John 3:16  or  Tobit 1:1  or  1 Maccabees 2:1" onkeydown="if(event.key==='Enter')doSearch()">
+        <button class="search-btn" onclick="doSearch()">Search</button>
+      </div>
+      <div id="searchResults"></div>
+    </div>
+
+    <div id="aboutTab" style="display:none">
+      <div class="chapter-header">
+        <div class="chapter-title apoc-title">The Forbidden Books</div>
+        <div class="version-badge">The Apocrypha — Historical Context</div>
+      </div>
+      <div style="line-height:1.9;color:var(--cream)">
+        <p style="margin-bottom:16px">The <strong style="color:var(--purple-light)">Apocrypha</strong> (Greek: <em>apókryphos</em> — "hidden things") are ancient texts written between roughly 300 BCE and 100 CE. They were part of the Septuagint — the Greek Old Testament used by early Christians — and quoted by Church Fathers for centuries.</p>
+        <p style="margin-bottom:16px">All King James Bibles published before <strong style="color:var(--gold)">1666</strong> included the Apocrypha. The Catholic Church declared them canonical at the <strong style="color:var(--gold)">Council of Trent (1546)</strong>. Protestant reformers gradually removed them, though Luther himself called them <em>"useful and good to read."</em></p>
+        <p style="margin-bottom:26px">They remain fully canonical in <strong style="color:var(--gold)">Catholic, Eastern Orthodox, and Ethiopian Orthodox</strong> traditions to this day.</p>
+        <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;color:var(--purple-light);margin-bottom:16px;text-transform:uppercase;border-top:1px solid var(--border-purple);padding-top:22px">The Books — Click to Read</div>
+        <div id="apocSummaryList" style="display:grid;gap:12px"></div>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+
+<div class="toast" id="toast">Verse copied!</div>
+
+<script>
+/* ─── BOOK DATA ─── */
+const OT_BOOKS=[
+  {name:'Genesis',id:'genesis',chapters:50},{name:'Exodus',id:'exodus',chapters:40},
+  {name:'Leviticus',id:'leviticus',chapters:27},{name:'Numbers',id:'numbers',chapters:36},
+  {name:'Deuteronomy',id:'deuteronomy',chapters:34},{name:'Joshua',id:'joshua',chapters:24},
+  {name:'Judges',id:'judges',chapters:21},{name:'Ruth',id:'ruth',chapters:4},
+  {name:'1 Samuel',id:'1-samuel',chapters:31},{name:'2 Samuel',id:'2-samuel',chapters:24},
+  {name:'1 Kings',id:'1-kings',chapters:22},{name:'2 Kings',id:'2-kings',chapters:25},
+  {name:'1 Chronicles',id:'1-chronicles',chapters:29},{name:'2 Chronicles',id:'2-chronicles',chapters:36},
+  {name:'Ezra',id:'ezra',chapters:10},{name:'Nehemiah',id:'nehemiah',chapters:13},
+  {name:'Esther',id:'esther',chapters:10},{name:'Job',id:'job',chapters:42},
+  {name:'Psalms',id:'psalms',chapters:150},{name:'Proverbs',id:'proverbs',chapters:31},
+  {name:'Ecclesiastes',id:'ecclesiastes',chapters:12},{name:'Song of Solomon',id:'song-of-solomon',chapters:8},
+  {name:'Isaiah',id:'isaiah',chapters:66},{name:'Jeremiah',id:'jeremiah',chapters:52},
+  {name:'Lamentations',id:'lamentations',chapters:5},{name:'Ezekiel',id:'ezekiel',chapters:48},
+  {name:'Daniel',id:'daniel',chapters:12},{name:'Hosea',id:'hosea',chapters:14},
+  {name:'Joel',id:'joel',chapters:3},{name:'Amos',id:'amos',chapters:9},
+  {name:'Obadiah',id:'obadiah',chapters:1},{name:'Jonah',id:'jonah',chapters:4},
+  {name:'Micah',id:'micah',chapters:7},{name:'Nahum',id:'nahum',chapters:3},
+  {name:'Habakkuk',id:'habakkuk',chapters:3},{name:'Zephaniah',id:'zephaniah',chapters:3},
+  {name:'Haggai',id:'haggai',chapters:2},{name:'Zechariah',id:'zechariah',chapters:14},
+  {name:'Malachi',id:'malachi',chapters:4}
+];
+const NT_BOOKS=[
+  {name:'Matthew',id:'matthew',chapters:28},{name:'Mark',id:'mark',chapters:16},
+  {name:'Luke',id:'luke',chapters:24},{name:'John',id:'john',chapters:21},
+  {name:'Acts',id:'acts',chapters:28},{name:'Romans',id:'romans',chapters:16},
+  {name:'1 Corinthians',id:'1-corinthians',chapters:16},{name:'2 Corinthians',id:'2-corinthians',chapters:13},
+  {name:'Galatians',id:'galatians',chapters:6},{name:'Ephesians',id:'ephesians',chapters:6},
+  {name:'Philippians',id:'philippians',chapters:4},{name:'Colossians',id:'colossians',chapters:4},
+  {name:'1 Thessalonians',id:'1-thessalonians',chapters:5},{name:'2 Thessalonians',id:'2-thessalonians',chapters:3},
+  {name:'1 Timothy',id:'1-timothy',chapters:6},{name:'2 Timothy',id:'2-timothy',chapters:4},
+  {name:'Titus',id:'titus',chapters:3},{name:'Philemon',id:'philemon',chapters:1},
+  {name:'Hebrews',id:'hebrews',chapters:13},{name:'James',id:'james',chapters:5},
+  {name:'1 Peter',id:'1-peter',chapters:5},{name:'2 Peter',id:'2-peter',chapters:3},
+  {name:'1 John',id:'1-john',chapters:5},{name:'2 John',id:'2-john',chapters:1},
+  {name:'3 John',id:'3-john',chapters:1},{name:'Jude',id:'jude',chapters:1},
+  {name:'Revelation',id:'revelation',chapters:22}
+];
+
+// Apocrypha — bolls.life book IDs for KJV apocrypha numbering
+const APOC_BOOKS=[
+  {name:'1 Esdras',id:'1-esdras',chapters:9,apoc:true,bolls:68,
+   desc:'Parallels Chronicles, Ezra & Nehemiah. Features the famous debate: what is strongest — wine, kings, women, or truth?',also:'Orthodox, Slavonic Bibles'},
+  {name:'2 Esdras',id:'2-esdras',chapters:16,apoc:true,bolls:69,
+   desc:'Apocalyptic visions attributed to Ezra on divine justice, suffering, and the end of days. Chapters 3–14 likely date to ~100 CE.',also:'Slavonic Bibles, Vulgate Appendix'},
+  {name:'Tobit',id:'tobit',chapters:14,apoc:true,bolls:70,
+   desc:'A tale of faith, family, and the angel Raphael guiding a blind man\'s son. Dead Sea Scroll fragments confirm its antiquity.',also:'Catholic, Orthodox, Anglican'},
+  {name:'Judith',id:'judith',chapters:16,apoc:true,bolls:71,
+   desc:'The heroic widow Judith saves her city by slaying the Assyrian general Holofernes. One of the most dramatic stories in all scripture.',also:'Catholic, Orthodox, Anglican'},
+  {name:'Wisdom of Solomon',id:'wisdom-of-solomon',chapters:19,apoc:true,bolls:72,
+   desc:'A meditation on divine Wisdom, the soul\'s immortality, and God\'s justice. Written in Greek, likely Alexandria ~100 BCE.',also:'Catholic, Orthodox, Anglican'},
+  {name:'Sirach (Ecclesiasticus)',id:'sirach',chapters:51,apoc:true,bolls:73,
+   desc:'Ben Sira\'s massive wisdom collection — moral teaching, poetry, praise. Its Hebrew original was rediscovered among the Dead Sea Scrolls.',also:'Catholic, Orthodox, Anglican'},
+  {name:'Baruch',id:'baruch',chapters:5,apoc:true,bolls:74,
+   desc:'Attributed to Jeremiah\'s scribe Baruch. Contains Israel\'s confession of sin, a hymn to Wisdom, and a poem of comfort for the exiled.',also:'Catholic, Orthodox, Anglican'},
+  {name:'Letter of Jeremiah',id:'letter-of-jeremiah',chapters:1,apoc:true,bolls:75,
+   desc:'A letter warning Jewish exiles in Babylon against idol worship. Appears as chapter 6 of Baruch in Catholic Bibles.',also:'Catholic, Orthodox, Anglican'},
+  {name:'Additions to Esther',id:'additions-to-esther',chapters:7,apoc:true,bolls:76,
+   desc:'Six Greek additions to Esther: prayers, royal letters, and scenes absent from the Hebrew — adding a profound theological depth.',also:'Catholic, Orthodox Bibles'},
+  {name:'Prayer of Azariah',id:'prayer-of-azariah',chapters:1,apoc:true,bolls:77,
+   desc:'Azariah\'s prayer in the fiery furnace, and the Song of the Three Holy Children. Added to Daniel chapter 3 in Catholic & Orthodox Bibles.',also:'Catholic, Orthodox Bibles'},
+  {name:'Susanna',id:'susanna',chapters:1,apoc:true,bolls:78,
+   desc:'Daniel saves the virtuous Susanna from false accusation by corrupt elders. A thrilling courtroom drama. Appears as Daniel 13 in Catholic Bibles.',also:'Catholic, Orthodox Bibles'},
+  {name:'Bel and the Dragon',id:'bel-and-the-dragon',chapters:1,apoc:true,bolls:79,
+   desc:'Daniel exposes the priests of Bel as frauds and destroys a dragon worshipped as a god. Appears as Daniel 14 in Catholic Bibles.',also:'Catholic, Orthodox Bibles'},
+  {name:'Prayer of Manasseh',id:'prayer-of-manasseh',chapters:1,apoc:true,bolls:80,
+   desc:'A beautiful penitential prayer of the wicked king Manasseh — his cry of repentance. Referenced in 2 Chronicles 33:13. Powerful and moving.',also:'Orthodox, KJV Apocrypha'},
+  {name:'1 Maccabees',id:'1-maccabees',chapters:16,apoc:true,bolls:81,
+   desc:'The primary historical account of Judas Maccabeus\'s revolt against Antiochus IV (175–134 BCE). The story behind Hanukkah.',also:'Catholic, Orthodox, Anglican'},
+  {name:'2 Maccabees',id:'2-maccabees',chapters:15,apoc:true,bolls:82,
+   desc:'A theological retelling of the revolt, emphasising resurrection and prayers for the dead — doctrines central to Catholic and Orthodox theology.',also:'Catholic, Orthodox, Anglican'}
+];
+
+const ALL_BOOKS=[...OT_BOOKS,...NT_BOOKS,...APOC_BOOKS];
+
+/* ─── STATE ─── */
+let state={version:'en-asv',book:null,chapter:1,isApoc:false};
+
+/* ─── INIT ─── */
+function init(){
+  renderList('otBooks',OT_BOOKS,false);
+  renderList('ntBooks',NT_BOOKS,false);
+  renderList('apocBooks',APOC_BOOKS,true);
+  renderAbout();
+}
+
+function renderList(id,books,isApoc){
+  const ul=document.getElementById(id);
+  books.forEach(b=>{
+    const li=document.createElement('li');
+    li.className='book-item'+(isApoc?' apoc-item':'');
+    li.dataset.id=b.id;
+    li.textContent=b.name;
+    li.onclick=()=>selectBook(b,isApoc);
+    ul.appendChild(li);
+  });
+}
+
+function renderAbout(){
+  const el=document.getElementById('apocSummaryList');
+  APOC_BOOKS.forEach(b=>{
+    const d=document.createElement('div');
+    d.className='apoc-card';
+    d.innerHTML=`<div class="apoc-card-title">${b.name}</div><div class="apoc-card-desc">${b.desc}</div><div class="apoc-card-canon">Accepted by: ${b.also}</div>`;
+    d.onclick=()=>{selectBook(b,true);switchTab('read',document.getElementById('tab-read'));};
+    el.appendChild(d);
+  });
+}
+
+/* ─── PANEL SWITCH ─── */
+function showPanel(p,btn){
+  document.querySelectorAll('.book-panel').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.testament-tab').forEach(x=>x.classList.remove('active'));
+  document.getElementById('panel-'+p).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ─── SELECT BOOK ─── */
+function selectBook(book,isApoc){
+  state.book=book; state.chapter=1; state.isApoc=isApoc;
+  document.querySelectorAll('.book-item').forEach(el=>{
+    el.classList.remove('active');
+    if(el.dataset.id===book.id) el.classList.add('active');
+  });
+  buildChapterGrid(book.chapters,isApoc);
+  document.getElementById('chapterSidebar').classList.add('visible');
+  switchTab('read',document.getElementById('tab-read'));
+  loadChapter();
+}
+
+function buildChapterGrid(total,isApoc){
+  const g=document.getElementById('chapterGrid');
+  g.innerHTML='';
+  for(let i=1;i<=total;i++){
+    const b=document.createElement('button');
+    b.className='chapter-btn'+(i===1?(isApoc?' ch-apoc':' ch-active'):'');
+    b.textContent=i; b.dataset.ch=i;
+    b.onclick=()=>{state.chapter=i;updateChBtns();loadChapter();};
+    g.appendChild(b);
+  }
+}
+
+function updateChBtns(){
+  const ac=state.isApoc?'ch-apoc':'ch-active';
+  document.querySelectorAll('.chapter-btn').forEach(b=>{
+    b.classList.remove('ch-active','ch-apoc');
+    if(parseInt(b.dataset.ch)===state.chapter) b.classList.add(ac);
+  });
+}
+
+/* ─── API ─── */
+const WLDEH='https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles';
+const BOLLS='https://bolls.life/get-text';
+
+async function getWldeh(ver,bookId,ch){
+  const r=await fetch(`${WLDEH}/${ver}/books/${bookId}/chapters/${ch}.json`);
+  if(!r.ok) throw new Error(r.status);
+  const d=await r.json();
+  return(d.verses||d).map(v=>({verse:v.verse||v.number,text:(v.text||'').replace(/<[^>]+>/g,'')}));
+}
+
+async function getBolls(bollsId,ch){
+  const r=await fetch(`${BOLLS}/KJV/${bollsId}/${ch}/`);
+  if(!r.ok) throw new Error(r.status);
+  const d=await r.json();
+  if(!Array.isArray(d)||!d.length) throw new Error('empty');
+  return d.map(v=>({verse:v.verse,text:(v.text||'').replace(/<[^>]+>/g,'')}));
+}
+
+/* ─── LOAD CHAPTER ─── */
+async function loadChapter(){
+  const area=document.getElementById('contentArea');
+  const ia=state.isApoc;
+  area.innerHTML=`<div class="loading-state"><span class="loading-cross${ia?' apoc':''}">${ia?'✦':'✝'}</span>Loading scripture…</div>`;
+
+  let verses=null,source='';
+
+  if(ia){
+    // Apocrypha: bolls.life first, then DRA fallback
+    try{verses=await getBolls(state.book.bolls,state.chapter);source='KJV Apocrypha';}
+    catch(e){
+      const ids=[state.book.id,state.book.id.replace(/-/g,''),state.book.id.replace(/(\d)-/,'$1')];
+      for(const id of ids){
+        try{verses=await getWldeh('en-dra',id,state.chapter);source='Douay-Rheims';break;}catch(e2){}
+      }
+    }
+  } else {
+    // Canonical: wldeh with selected version
+    const ids=[state.book.id,state.book.id.replace(/-/g,'')];
+    for(const id of ids){
+      try{verses=await getWldeh(state.version,id,state.chapter);source=document.getElementById('versionSelect').selectedOptions[0].text.split('—')[0].trim();break;}catch(e){}
+    }
+  }
+
+  if(!verses||!verses.length){
+    area.innerHTML=`<div class="error-state"><span>⚠</span><p>Could not load <strong>${state.book.name} ${state.chapter}</strong>.</p><p style="margin-top:8px;font-size:14px;opacity:.6">${ia?'Try the DRA version or check the book name.':'Try another Bible version.'}</p></div>`;
+    return;
+  }
+  renderChapter(verses,source);
+}
+
+/* ─── RENDER ─── */
+function renderChapter(verses,source){
+  const area=document.getElementById('contentArea');
+  const ia=state.isApoc;
+  const tc=ia?'apoc-title':'',nc=ia?'apoc-num':'',nav=ia?'apoc-nav':'',vc=ia?'apoc-verse':'';
+
+  let html=`<div class="chapter-header"><div class="chapter-title ${tc}">${state.book.name} — Chapter ${state.chapter}</div><div class="version-badge">${source}</div></div>`;
+
+  if(ia){
+    html+=`<div class="apoc-banner"><strong>Apocryphal Book</strong> — ${state.book.desc}<div style="margin-top:5px;font-size:13px">Accepted as canonical by: ${state.book.also}</div></div>`;
+  }
+
+  html+=`<div class="verses-container">`;
+  verses.forEach(v=>{
+    html+=`<div class="verse ${vc}" onclick="copyVerse('${state.book.name} ${state.chapter}:${v.verse}',this)" title="Click to copy"><div class="verse-num ${nc}">${v.verse}</div><div class="verse-text">${v.text}</div></div>`;
+  });
+  html+=`</div><div class="chapter-nav">
+    <button class="nav-btn ${nav}" onclick="prevCh()" ${state.chapter===1?'disabled':''}>← Previous</button>
+    <span style="font-family:'Cinzel',serif;font-size:11px;color:var(--gold-dim);letter-spacing:2px">${state.chapter} / ${state.book.chapters}</span>
+    <button class="nav-btn ${nav}" onclick="nextCh()" ${state.chapter===state.book.chapters?'disabled':''}>Next →</button>
+  </div>`;
+
+  area.innerHTML=html;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function prevCh(){if(state.chapter>1){state.chapter--;updateChBtns();loadChapter();}}
+function nextCh(){if(state.chapter<state.book.chapters){state.chapter++;updateChBtns();loadChapter();}}
+function onVersionChange(){state.version=document.getElementById('versionSelect').value;if(state.book&&!state.isApoc)loadChapter();}
+
+/* ─── COPY ─── */
+function copyVerse(ref,el){
+  const text=el.querySelector('.verse-text').textContent;
+  navigator.clipboard.writeText(`"${text}" — ${ref}`).then(()=>{
+    el.classList.add('highlighted');
+    setTimeout(()=>el.classList.remove('highlighted'),1500);
+    const t=document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),2000);
+  }).catch(()=>{});
+}
+
+/* ─── SEARCH ─── */
+async function doSearch(){
+  const q=document.getElementById('searchInput').value.trim();
+  const res=document.getElementById('searchResults');
+  if(!q)return;
+  res.innerHTML=`<div class="loading-state"><span class="loading-cross">✝</span>Searching…</div>`;
+
+  const m=q.match(/^(.+?)\s+(\d+):(\d+)$/i);
+  if(m){
+    const bName=m[1].trim().toLowerCase(),ch=parseInt(m[2]),vs=parseInt(m[3]);
+    const found=ALL_BOOKS.find(b=>b.name.toLowerCase()===bName||b.name.toLowerCase().startsWith(bName)||b.id.replace(/-/g,' ')===bName);
+    if(found){
+      const ia=!!found.apoc;
+      try{
+        const verses=ia?await getBolls(found.bolls,ch):await getWldeh(state.version,found.id,ch);
+        const v=verses.find(x=>x.verse==vs);
+        if(v){
+          const tc=ia?'apoc-title':'',nc=ia?'apoc-num':'',vc=ia?'apoc-verse':'';
+          const badge=ia?`<span style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;padding:2px 6px;background:rgba(90,53,112,.4);color:var(--purple-light);border:1px solid var(--purple-dim);border-radius:2px;margin-left:8px">APOCRYPHA</span>`:'';
+          res.innerHTML=`<div class="chapter-header"><div class="chapter-title ${tc}">${found.name} ${ch}:${vs}${badge}</div></div>
+          <div class="verse ${vc}" onclick="goTo('${found.id}',${ch},${ia})" title="Click to open chapter" style="cursor:pointer">
+            <div class="verse-num ${nc}">${vs}</div><div class="verse-text">${v.text}</div>
+          </div>
+          <p style="margin-top:12px;font-size:13px;color:var(--cream-dim);font-style:italic">Click the verse to open the full chapter.</p>`;
+          return;
+        }
+      }catch(e){}
+    }
+  }
+
+  res.innerHTML=`<div class="error-state" style="padding:40px 20px"><span style="font-size:22px">📖</span><p style="margin-top:10px">Enter a reference like <strong>John 3:16</strong>, <strong>Tobit 1:1</strong>, or <strong>1 Maccabees 2:1</strong></p><p style="margin-top:8px;font-size:14px;opacity:.6">All 66 canonical books + 15 apocryphal books are supported.</p></div>`;
+}
+
+function goTo(bookId,ch,isApoc){
+  const b=ALL_BOOKS.find(x=>x.id===bookId);
+  if(!b)return;
+  selectBook(b,isApoc);
+  state.chapter=ch;
+  updateChBtns();
+  loadChapter();
+}
+
+/* ─── TABS ─── */
+function switchTab(tab,btn){
+  ['read','search','about'].forEach(t=>document.getElementById(t+'Tab').style.display=t===tab?'block':'none');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
+
+init();
+</script>
+</body>
+</html>
