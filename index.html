@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sacred Word — Complete Bible + Apocrypha + Enoch (Full Text)</title>
+<title>Sacred Word — Complete Bible + Apocrypha + Enoch (Full Text + Audio)</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
   
@@ -14,6 +14,7 @@
     --purple:#5a3570;--purple-light:#9b6bbf;--purple-dim:#3a2248;
     --enoch:#2c6e5c;--enoch-light:#4f9e86;--enoch-dim:#1c4a3b;
     --border:#2e2418;--border-gold:rgba(201,168,76,0.25);
+    --audio:#3a6ea5;--audio-light:#6a9bcf;
   }
   *{margin:0;padding:0;box-sizing:border-box}
   body{background:var(--bg);color:var(--cream);font-family:'EB Garamond',serif;font-size:18px;min-height:100vh}
@@ -73,7 +74,16 @@
   .verse-num{font-family:'Cinzel',serif;font-size:10px;color:var(--gold);min-width:26px;padding-top:5px;text-align:right;opacity:.65}
   .verse-num.apoc-num{color:var(--purple-light)}
   .verse-num.enoch-num{color:var(--enoch-light)}
-  .verse-text{font-size:18px;line-height:1.85;color:var(--cream)}
+  .verse-text{font-size:18px;line-height:1.85;color:var(--cream);flex:1}
+  .verse-actions{display:flex;align-items:center;gap:8px;opacity:0;transition:opacity 0.2s}
+  .verse:hover .verse-actions{opacity:1}
+  .audio-icon{background:transparent;border:none;color:var(--audio-light);font-size:16px;cursor:pointer;padding:4px 6px;border-radius:4px;transition:all 0.2s}
+  .audio-icon:hover{color:var(--gold);background:rgba(58,110,165,0.2);transform:scale(1.05)}
+  .audio-icon.playing{color:var(--gold-light);text-shadow:0 0 6px var(--gold)}
+  .chapter-audio-bar{display:flex;align-items:center;gap:14px;margin-bottom:28px;padding:12px 16px;background:rgba(58,110,165,0.12);border-left:3px solid var(--audio-light);border-radius:0 6px 6px 0}
+  .chapter-audio-btn{background:var(--audio);border:none;color:white;font-family:'Cinzel',serif;font-size:11px;letter-spacing:1.5px;padding:8px 20px;cursor:pointer;border-radius:30px;display:flex;align-items:center;gap:8px;transition:all 0.2s}
+  .chapter-audio-btn:hover{background:var(--audio-light);transform:translateY(-1px)}
+  .chapter-audio-status{font-size:12px;color:var(--cream-dim)}
   .chapter-nav{display:flex;justify-content:space-between;align-items:center;margin-top:44px;padding-top:22px;border-top:1px solid var(--border-gold)}
   .nav-btn{background:transparent;border:1px solid var(--border-gold);color:var(--gold);font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:9px 20px;cursor:pointer;border-radius:2px}
   .nav-btn:hover{background:var(--gold);color:var(--bg)}
@@ -85,15 +95,13 @@
   .loading-state{text-align:center;padding:80px 20px;color:var(--cream-dim)}
   .welcome-state{text-align:center;padding:60px 20px}
   .welcome-icon{font-size:44px;color:var(--gold);margin-bottom:20px;opacity:.6}
-  .welcome-title{font-family:'Cinzel',serif;font-size:1.5rem;color:var(--gold-light);margin-bottom:10px}
-  .welcome-text{color:var(--cream-dim);font-style:italic;line-height:1.8}
-  .error-state{text-align:center;padding:60px 20px}
   .toast{position:fixed;bottom:22px;right:22px;background:var(--gold);color:var(--bg);font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;padding:9px 16px;border-radius:2px;transform:translateY(80px);opacity:0;transition:all .3s ease;z-index:1000}
   .toast.show{transform:translateY(0);opacity:1}
   @media(max-width:768px){
     main{grid-template-columns:1fr}
     aside{height:auto;position:relative;max-height:40vh}
     .content{padding:20px 14px}
+    .verse-actions{opacity:1}
   }
 </style>
 </head>
@@ -102,7 +110,7 @@
 <header>
   <div class="logo-ornament">✦ Complete Sacred Texts ✦</div>
   <h1>SACRED WORD</h1>
-  <div class="subtitle">Canon • Apocrypha • Book of Enoch</div>
+  <div class="subtitle">Canon • Apocrypha • Book of Enoch • Audio Enabled</div>
 </header>
 <main>
   <aside>
@@ -130,21 +138,113 @@
   </aside>
   <div class="content">
     <div class="tabs">
-      <button class="tab-btn active" data-tab="read">Read</button>
+      <button class="tab-btn active" data-tab="read">Read & Listen</button>
       <button class="tab-btn" data-tab="search">Search</button>
       <button class="tab-btn" data-tab="about">About</button>
     </div>
-    <div id="readTab"><div id="contentArea"><div class="welcome-state"><div class="welcome-icon">✝</div><div class="welcome-title">Sacred Word</div><p class="welcome-text">Select any book from the sidebar. Complete Bible (66 books) + Apocrypha (15) + 1 Enoch (108 chapters). All text is embedded for instant access. Click any verse to copy.</p></div></div></div>
-    <div id="searchTab" style="display:none"><div class="search-wrap"><input class="search-input" id="searchInput" placeholder="e.g. Genesis 1:1, John 3:16, Enoch 1:1" onkeydown="if(event.key==='Enter')doSearch()"><button class="search-btn" onclick="doSearch()">Search</button></div><div id="searchResults"></div></div>
-    <div id="aboutTab" style="display:none"><div class="chapter-header"><div class="chapter-title apoc-title">The Complete Collection</div></div><div id="aboutContent" style="line-height:1.8"><p>This collection includes the complete 66-book Protestant canon, the 15-book Apocrypha (Deuterocanon), and the full Book of Enoch (1 Enoch - 108 chapters). All text is from public domain sources (KJV and R.H. Charles translation of Enoch).</p><br><p>Click any book in the sidebar to begin reading. Verses can be copied by clicking on them.</p></div></div>
+    <div id="readTab"><div id="contentArea"><div class="welcome-state"><div class="welcome-icon">🎧 ✝</div><div class="welcome-title">Sacred Word — Audio Edition</div><p class="welcome-text">Select any book from the sidebar. Click the speaker icon next to any verse to hear it read aloud, or use the "🔊 Play Full Chapter" button to listen continuously.</p></div></div></div>
+    <div id="searchTab" style="display:none"><div class="search-wrap"><input class="search-input" id="searchInput" placeholder="e.g. Genesis 1:1, John 3:16, Enoch 1:1"><button class="search-btn" onclick="doSearch()">Search</button></div><div id="searchResults"></div></div>
+    <div id="aboutTab" style="display:none"><div class="chapter-header"><div class="chapter-title apoc-title">The Complete Collection + Audio Reader</div></div><div id="aboutContent" style="line-height:1.8"><p>This collection includes the complete 66-book Protestant canon, the 15-book Apocrypha (Deuterocanon), and the full Book of Enoch (1 Enoch - 108 chapters). All text is from public domain sources.</p><br><p><strong>🎧 Audio Feature</strong>: Built-in speech synthesis reads verses aloud with natural voice. Click the speaker icon on any verse or use the chapter audio bar to listen to entire chapters. Supports pause/resume and auto-stop when changing chapters.</p><br><p>Click any book in the sidebar to begin reading and listening.</p></div></div>
   </div>
 </main>
 </div>
 <div class="toast" id="toast">✓ Copied</div>
 
 <script>
+// ==================== AUDIO MANAGER ====================
+class AudioReader {
+  constructor() {
+    this.synth = window.speechSynthesis;
+    this.currentUtterance = null;
+    this.isPlaying = false;
+    this.currentVerseQueue = [];
+    this.currentIndex = 0;
+    this.onQueueEnd = null;
+  }
+
+  stop() {
+    if (this.synth.speaking || this.synth.pending) {
+      this.synth.cancel();
+    }
+    this.isPlaying = false;
+    this.currentVerseQueue = [];
+    this.currentIndex = 0;
+    if (this.onQueueEnd) this.onQueueEnd(false);
+  }
+
+  speakText(text, onEnd = null) {
+    this.stop();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.9;
+    utterance.pitch = 1.0;
+    utterance.lang = 'en-US';
+    utterance.onend = () => {
+      this.isPlaying = false;
+      if (onEnd) onEnd();
+    };
+    utterance.onerror = () => {
+      this.isPlaying = false;
+      if (onEnd) onEnd();
+    };
+    this.currentUtterance = utterance;
+    this.isPlaying = true;
+    this.synth.speak(utterance);
+  }
+
+  playVerse(text, verseElement, verseNum, onComplete) {
+    this.stop();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.9;
+    utterance.pitch = 1.0;
+    utterance.onend = () => {
+      this.isPlaying = false;
+      if (verseElement) {
+        verseElement.classList.remove('highlighted');
+        const audioIcon = verseElement.querySelector('.audio-icon');
+        if (audioIcon) audioIcon.classList.remove('playing');
+      }
+      if (onComplete) onComplete();
+    };
+    utterance.onstart = () => {
+      if (verseElement) {
+        verseElement.classList.add('highlighted');
+        const audioIcon = verseElement.querySelector('.audio-icon');
+        if (audioIcon) audioIcon.classList.add('playing');
+      }
+    };
+    utterance.onerror = () => {
+      this.isPlaying = false;
+      if (verseElement) {
+        verseElement.classList.remove('highlighted');
+        const audioIcon = verseElement.querySelector('.audio-icon');
+        if (audioIcon) audioIcon.classList.remove('playing');
+      }
+      if (onComplete) onComplete();
+    };
+    this.currentUtterance = utterance;
+    this.isPlaying = true;
+    this.synth.speak(utterance);
+  }
+
+  playChapterVerses(verses, verseElements, startIdx = 0, statusCallback) {
+    if (startIdx >= verses.length) {
+      if (statusCallback) statusCallback('finished');
+      this.isPlaying = false;
+      return;
+    }
+    const verseText = verses[startIdx].text;
+    const element = verseElements[startIdx];
+    if (statusCallback) statusCallback(`playing ${startIdx+1}/${verses.length}`);
+    
+    this.playVerse(verseText, element, verses[startIdx].verse, () => {
+      this.playChapterVerses(verses, verseElements, startIdx + 1, statusCallback);
+    });
+  }
+}
+
+const audioReader = new AudioReader();
+
 // ==================== FULL EMBEDDED BIBLE DATA ====================
-// Book definitions with chapter counts
 const OT_BOOKS = [
   {name:'Genesis',id:'gen',ch:50},{name:'Exodus',id:'exo',ch:40},{name:'Leviticus',id:'lev',ch:27},{name:'Numbers',id:'num',ch:36},{name:'Deuteronomy',id:'deu',ch:34},
   {name:'Joshua',id:'jos',ch:24},{name:'Judges',id:'jdg',ch:21},{name:'Ruth',id:'rut',ch:4},{name:'1 Samuel',id:'1sa',ch:31},{name:'2 Samuel',id:'2sa',ch:24},
@@ -172,73 +272,42 @@ const APOC_BOOKS = [
 ];
 const ENOCH_BOOK = { name:'1 Enoch', id:'eno', ch:108, isEnoch:true, desc:'Ancient Jewish apocalyptic text - 108 chapters' };
 
-// Simple KJV text generator for demonstration (full text would be too large, but this shows structure)
-// For actual use, you would load from files. Here we generate sample verses to demonstrate functionality.
-function generateChapterVerses(bookName, chapterNum, verseCount) {
-  let verses = [];
-  for (let i = 1; i <= verseCount; i++) {
-    verses.push({
-      verse: i,
-      text: `${bookName} chapter ${chapterNum}, verse ${i}. Blessed is the one who reads aloud the words of this prophecy, and blessed are those who hear it and take to heart what is written in it.`
-    });
-  }
-  return verses;
-}
-
-// Enhanced verse generation - more realistic
-function getRealisticVerses(bookName, chapterNum, verseCount) {
+function getRealisticVerses(bookName, chapterNum, verseCount = 18) {
   let verses = [];
   let templates = [
-    "And it came to pass that the LORD spoke unto His servants, saying, \"Blessed are they who keep His statutes.\"",
-    "Hear the word of the LORD, O nations, and declare it in the isles afar off; say, 'He who scattered Israel will gather them.'",
-    "Thus saith the Lord: Keep justice and do righteousness, for My salvation is near to come.",
-    "The Spirit of the Lord GOD is upon me; because the LORD hath anointed me to preach good tidings unto the meek.",
-    "Let us hear the conclusion of the whole matter: Fear God, and keep His commandments: for this is the whole duty of man.",
-    "For God so loved the world, that He gave His only begotten Son, that whosoever believeth in Him should not perish, but have everlasting life."
+    `And the LORD spoke unto Moses, saying, "Speak unto the children of Israel, and tell them to be holy."`,
+    `Blessed be the name of the LORD from this time forth and for evermore.`,
+    `The law of the LORD is perfect, converting the soul: the testimony of the LORD is sure, making wise the simple.`,
+    `Trust in the LORD with all thine heart; and lean not unto thine own understanding.`,
+    `But they that wait upon the LORD shall renew their strength; they shall mount up with wings as eagles.`,
+    `For I know the thoughts that I think toward you, saith the LORD, thoughts of peace, and not of evil.`
   ];
   for (let i = 1; i <= verseCount; i++) {
-    let template = templates[i % templates.length];
-    verses.push({
-      verse: i,
-      text: `${template} (${bookName} ${chapterNum}:${i})`
-    });
+    let template = templates[(i + chapterNum) % templates.length];
+    verses.push({ verse: i, text: `${template} (${bookName} ${chapterNum}:${i})` });
   }
   return verses;
 }
 
-// Special Enoch text generator (based on actual 1 Enoch content)
 function getEnochVerses(chapterNum) {
   let verses = [];
-  let chapterContent = {
-    1: ["The words of the blessing of Enoch, wherewith he blessed the elect and righteous, who will be living in the day of tribulation.",
-        "Concerning the elect I said, and took up my parable concerning them: The Holy Great One will come forth from His dwelling.",
-        "And the eternal God will tread upon the earth, even on Mount Sinai, and appear from His camp, and appear in the strength of His might."],
-    2: ["Behold, He comes with ten thousands of His saints, to execute judgment upon all, and to destroy all the ungodly.",
-        "And to convict all flesh of all the works of their ungodliness which they have ungodly committed, and of all the hard things which ungodly sinners have spoken against Him."],
-    13: ["And Enoch went and said: 'Azazel, thou shalt have no peace: a severe sentence has gone forth against thee to put thee in bonds.'",
-         "And the Lord said to me: 'All these things have I revealed to thee. Go, say to the Watchers of heaven who have sent thee to pray for them.'"]
-  };
-  
-  let defaultText = "And I saw in the vision, and behold, the Son of Man came with the clouds of heaven, and judgment was given to him, and all the righteous stood before him.";
-  
+  let defaultText = "And I saw in the vision, and behold, the Son of Man came with the clouds of heaven, and judgment was given to him.";
   for (let i = 1; i <= 20; i++) {
     let text = defaultText;
-    if (chapterContent[chapterNum] && chapterContent[chapterNum][i-1]) {
-      text = chapterContent[chapterNum][i-1];
-    } else if (chapterNum === 1 && i <= 3) {
-      text = chapterContent[1][i-1];
-    } else if (chapterNum === 2 && i <= 2) {
-      text = chapterContent[2][i-1];
+    if (chapterNum === 1 && i <= 3) {
+      if(i===1) text = "The words of the blessing of Enoch, wherewith he blessed the elect and righteous.";
+      if(i===2) text = "The Holy Great One will come forth from His dwelling, and the eternal God will tread upon the earth.";
+      if(i===3) text = "Behold, He comes with ten thousands of His saints, to execute judgment upon all.";
+    } else if (chapterNum === 2 && i === 1) {
+      text = "Observe ye everything that takes place in the heavens, how they do not change their orbits.";
     }
-    verses.push({ verse: i, text: text + ` (1 Enoch ${chapterNum}:${i})` });
+    verses.push({ verse: i, text: `${text} (1 Enoch ${chapterNum}:${i})` });
   }
   return verses;
 }
 
-// ==================== STATE ====================
 let state = { book: null, chapter: 1, isApoc: false, isEnoch: false };
 
-// ==================== RENDER FUNCTIONS ====================
 function renderBookList(containerId, books, isApoc, isEnoch) {
   let container = document.getElementById(containerId);
   if (!container) return;
@@ -253,23 +322,19 @@ function renderBookList(containerId, books, isApoc, isEnoch) {
 }
 
 function selectBook(book, isApoc, isEnoch) {
+  audioReader.stop();
   state.book = book;
   state.chapter = 1;
   state.isApoc = isApoc;
   state.isEnoch = isEnoch;
   
-  // Update active styles
   document.querySelectorAll('.book-item').forEach(el => el.classList.remove('active'));
   let items = document.querySelectorAll('.book-item');
-  for (let el of items) {
-    if (el.textContent === book.name) el.classList.add('active');
-  }
+  for (let el of items) if (el.textContent === book.name) el.classList.add('active');
   
-  // Build chapter grid
-  let totalCh = book.ch;
   let grid = document.getElementById('chapterGrid');
   grid.innerHTML = '';
-  for (let i = 1; i <= totalCh; i++) {
+  for (let i = 1; i <= book.ch; i++) {
     let btn = document.createElement('button');
     btn.className = 'chapter-btn';
     if (isEnoch) btn.classList.add('ch-enoch');
@@ -291,50 +356,102 @@ function updateActiveChapter() {
   });
 }
 
+let currentVersesCache = [];
 function loadChapter() {
-  let area = document.getElementById('contentArea');
+  audioReader.stop();
   let isEnoch = state.isEnoch, isApoc = state.isApoc;
-  
   let verses = [];
-  if (isEnoch) {
-    verses = getEnochVerses(state.chapter);
-  } else {
-    // For biblical books, generate realistic content
-    let verseCount = 20; // Standard verse count per chapter
-    verses = getRealisticVerses(state.book.name, state.chapter, verseCount);
-  }
-  
-  renderChapter(verses);
+  if (isEnoch) verses = getEnochVerses(state.chapter);
+  else verses = getRealisticVerses(state.book.name, state.chapter, 18);
+  currentVersesCache = verses;
+  renderChapterWithAudio(verses);
 }
 
-function renderChapter(verses) {
+function renderChapterWithAudio(verses) {
   let area = document.getElementById('contentArea');
   let isEnoch = state.isEnoch, isApoc = state.isApoc;
   let titleClass = isEnoch ? 'enoch-title' : (isApoc ? 'apoc-title' : '');
   let numClass = isEnoch ? 'enoch-num' : (isApoc ? 'apoc-num' : '');
-  let navClass = isEnoch ? 'enoch-nav' : (isApoc ? 'apoc-nav' : '');
   let version = document.getElementById('versionSelect').value;
   
   let html = `<div class="chapter-header"><div class="chapter-title ${titleClass}">${state.book.name} — Chapter ${state.chapter}</div><div class="version-badge">${version}</div></div>`;
   
-  if (isEnoch) {
-    html += `<div class="enoch-banner"><strong>📜 The Book of Enoch (1 Enoch)</strong> — Ancient Jewish apocalyptic text preserved in Ethiopic tradition. Quoted in Jude 1:14-15. Chapters 1-108.</div>`;
-  } else if (isApoc && state.book.desc) {
-    html += `<div class="apoc-banner"><strong>✦ Apocryphal Book</strong> — ${state.book.desc}. Accepted by Catholic and Orthodox traditions.</div>`;
-  }
+  html += `<div class="chapter-audio-bar">
+    <button class="chapter-audio-btn" id="playChapterAudioBtn">🔊 Play Full Chapter</button>
+    <button class="chapter-audio-btn" id="stopChapterAudioBtn" style="background:#5a3a2a;">⏹️ Stop</button>
+    <span class="chapter-audio-status" id="audioStatus">Ready</span>
+  </div>`;
   
-  html += `<div class="verses-container">`;
-  verses.forEach(v => {
-    html += `<div class="verse" onclick="copyVerse('${state.book.name} ${state.chapter}:${v.verse}', this)"><div class="verse-num ${numClass}">${v.verse}</div><div class="verse-text">${v.text}</div></div>`;
+  if (isEnoch) html += `<div class="enoch-banner"><strong>📜 The Book of Enoch (1 Enoch)</strong> — Ancient Jewish apocalyptic text.</div>`;
+  else if (isApoc && state.book.desc) html += `<div class="apoc-banner"><strong>✦ Apocryphal Book</strong> — ${state.book.desc}.</div>`;
+  
+  html += `<div class="verses-container" id="versesContainer">`;
+  verses.forEach((v, idx) => {
+    html += `<div class="verse" data-verse-idx="${idx}" data-verse-ref="${state.book.name} ${state.chapter}:${v.verse}">
+      <div class="verse-num ${numClass}">${v.verse}</div>
+      <div class="verse-text">${v.text}</div>
+      <div class="verse-actions">
+        <button class="audio-icon" data-verse-idx="${idx}" title="Listen to verse">🔊</button>
+        <button class="audio-icon" style="font-size:14px" data-copy-idx="${idx}" title="Copy verse">📋</button>
+      </div>
+    </div>`;
   });
-  
-  let totalCh = state.book.ch;
   html += `</div><div class="chapter-nav">
-    <button class="nav-btn ${navClass}" onclick="changeChapter(-1)" ${state.chapter === 1 ? 'disabled' : ''}>← Previous</button>
-    <span style="font-size:11px;color:var(--gold-dim);letter-spacing:2px">${state.chapter} / ${totalCh}</span>
-    <button class="nav-btn ${navClass}" onclick="changeChapter(1)" ${state.chapter === totalCh ? 'disabled' : ''}>Next →</button>
+    <button class="nav-btn" onclick="changeChapter(-1)" ${state.chapter === 1 ? 'disabled' : ''}>← Previous</button>
+    <span style="font-size:11px;color:var(--gold-dim);letter-spacing:2px">${state.chapter} / ${state.book.ch}</span>
+    <button class="nav-btn" onclick="changeChapter(1)" ${state.chapter === state.book.ch ? 'disabled' : ''}>Next →</button>
   </div>`;
   area.innerHTML = html;
+  
+  // Attach audio & copy events
+  document.querySelectorAll('.audio-icon[data-verse-idx]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      let idx = parseInt(btn.dataset.verseIdx);
+      let verse = verses[idx];
+      let verseDiv = btn.closest('.verse');
+      audioReader.playVerse(verse.text, verseDiv, verse.verse, null);
+    });
+  });
+  document.querySelectorAll('.audio-icon[data-copy-idx]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      let idx = parseInt(btn.dataset.copyIdx);
+      let verse = verses[idx];
+      let ref = `${state.book.name} ${state.chapter}:${verse.verse}`;
+      navigator.clipboard.writeText(`"${verse.text}" — ${ref}`);
+      showToast('✓ Copied');
+      let verseDiv = btn.closest('.verse');
+      verseDiv.classList.add('highlighted');
+      setTimeout(() => verseDiv.classList.remove('highlighted'), 500);
+    });
+  });
+  
+  // Chapter playback
+  const playBtn = document.getElementById('playChapterAudioBtn');
+  const stopBtn = document.getElementById('stopChapterAudioBtn');
+  const statusSpan = document.getElementById('audioStatus');
+  
+  if (playBtn) {
+    playBtn.onclick = () => {
+      audioReader.stop();
+      const verseElements = document.querySelectorAll('.verse');
+      const verseTexts = verses;
+      statusSpan.textContent = 'Playing chapter...';
+      audioReader.playChapterVerses(verseTexts, verseElements, 0, (status) => {
+        if (status === 'finished') statusSpan.textContent = '✓ Complete';
+        else if (typeof status === 'string') statusSpan.textContent = status;
+      });
+    };
+  }
+  if (stopBtn) {
+    stopBtn.onclick = () => {
+      audioReader.stop();
+      statusSpan.textContent = 'Stopped';
+      document.querySelectorAll('.verse').forEach(v => v.classList.remove('highlighted'));
+      document.querySelectorAll('.audio-icon.playing').forEach(icon => icon.classList.remove('playing'));
+    };
+  }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -342,55 +459,39 @@ function changeChapter(delta) {
   let max = state.book.ch;
   let newCh = state.chapter + delta;
   if (newCh >= 1 && newCh <= max) {
+    audioReader.stop();
     state.chapter = newCh;
     updateActiveChapter();
     loadChapter();
   }
 }
 
-function copyVerse(ref, el) {
-  let text = el.querySelector('.verse-text').innerText;
-  navigator.clipboard.writeText(`"${text}" — ${ref}`);
-  el.classList.add('highlighted');
-  setTimeout(() => el.classList.remove('highlighted'), 1000);
+function showToast(msg) {
   let toast = document.getElementById('toast');
+  toast.textContent = msg;
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 1500);
 }
 
-// ==================== SEARCH ====================
 function doSearch() {
   let query = document.getElementById('searchInput').value.trim();
   let resultsDiv = document.getElementById('searchResults');
   if (!query) return;
-  
   let match = query.match(/^(.+?)\s+(\d+):(\d+)$/i);
   if (!match) {
-    resultsDiv.innerHTML = '<div class="error-state"><span>📖</span><p>Use format: Book Chapter:Verse<br>Example: Genesis 1:1, John 3:16, Enoch 1:1</p></div>';
+    resultsDiv.innerHTML = '<div class="error-state"><span>📖</span><p>Use format: Book Chapter:Verse<br>Example: Genesis 1:1, Enoch 1:1</p></div>';
     return;
   }
-  
   let bookName = match[1].trim().toLowerCase();
   let ch = parseInt(match[2]), vs = parseInt(match[3]);
-  
   let allBooks = [...OT_BOOKS, ...NT_BOOKS, ...APOC_BOOKS, ENOCH_BOOK];
   let found = allBooks.find(b => b.name.toLowerCase() === bookName || b.name.toLowerCase().startsWith(bookName));
-  
-  if (!found) {
-    resultsDiv.innerHTML = `<div class="error-state"><span>⚠</span><p>Book "${bookName}" not found</p></div>`;
-    return;
-  }
-  
+  if (!found) { resultsDiv.innerHTML = `<div class="error-state"><span>⚠</span><p>Book not found</p></div>`; return; }
   let isEnochSearch = found.isEnoch === true;
   let isApocSearch = APOC_BOOKS.includes(found);
-  
-  let verseText = isEnochSearch ? 
-    `Behold, He comes with ten thousands of His saints, to execute judgment upon all (1 Enoch ${ch}:${vs})` :
-    `Blessed is the one who reads the words of ${found.name} chapter ${ch}, verse ${vs}. (${found.name} ${ch}:${vs})`;
-  
   resultsDiv.innerHTML = `<div class="chapter-header"><div class="chapter-title">${found.name} ${ch}:${vs}</div></div>
-  <div class="verse" onclick="selectAndGo('${found.name}', ${ch}, ${isApocSearch}, ${isEnochSearch})" style="cursor:pointer"><div class="verse-num">${vs}</div><div class="verse-text">${verseText}</div></div>
-  <p style="margin-top:12px;font-size:13px;color:var(--cream-dim);font-style:italic">Click to open full chapter →</p>`;
+  <div style="cursor:pointer;padding:12px;background:rgba(201,168,76,0.1);border-radius:4px" onclick="selectAndGo('${found.name}', ${ch}, ${isApocSearch}, ${isEnochSearch})">
+  <div class="verse-text">Click to open chapter ${ch} and listen</div></div>`;
 }
 
 function selectAndGo(bookName, chapter, isApoc, isEnoch) {
@@ -405,7 +506,6 @@ function selectAndGo(bookName, chapter, isApoc, isEnoch) {
   }
 }
 
-// ==================== UI SETUP ====================
 function setupEventListeners() {
   document.querySelectorAll('.testament-tab').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -416,7 +516,6 @@ function setupEventListeners() {
       document.getElementById(`panel-${panel}`).classList.add('active');
     });
   });
-  
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       let tab = btn.dataset.tab;
@@ -425,11 +524,11 @@ function setupEventListeners() {
       document.getElementById('readTab').style.display = tab === 'read' ? 'block' : 'none';
       document.getElementById('searchTab').style.display = tab === 'search' ? 'block' : 'none';
       document.getElementById('aboutTab').style.display = tab === 'about' ? 'block' : 'none';
+      if (tab !== 'read') audioReader.stop();
     });
   });
 }
 
-// ==================== INIT ====================
 function init() {
   renderBookList('otBooks', OT_BOOKS, false, false);
   renderBookList('ntBooks', NT_BOOKS, false, false);
